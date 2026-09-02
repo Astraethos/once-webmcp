@@ -2,9 +2,12 @@
 
 Teach an agent by working with it once.
 
-ONCE is a planned open-source WebMCP application for the OpenAI WebMCP Challenge.
-This repository contains **setup and an empty application scaffold only**.
-Semantic recording, routines, replay, approvals, and WebMCP integration are not implemented.
+ONCE is an open-source Vendor Evaluation experiment for the OpenAI WebMCP Challenge.
+The **M1 semantic core** is implemented: a synchronous command bus, actor-tagged
+events, atomic batches, deterministic fictional vendor dossiers, and versioned
+local persistence. The page remains an empty scaffold until M2.
+Human/WebMCP UI integration, teaching, replay, and approval execution are not implemented.
+ONCE does not claim arbitrary workflow learning.
 
 ## Stack
 
@@ -28,19 +31,45 @@ No environment variables, API keys, database, or paid services are needed.
 
 ```sh
 pnpm check
+pnpm test
 ```
 
 This runs linting with zero warnings, generates route types, checks TypeScript,
-and builds for production. GitHub Actions runs the same checks for pull requests
-and pushes to `main`. Product tests will be added with product implementation.
+and builds for production. `pnpm test` runs the deterministic Vitest suite.
+GitHub Actions runs both commands for pull requests and pushes to `main`.
 Run `pnpm start` after building to serve the production build locally.
 
 ## Conventions
 
-- Application code lives in `src/app`; `@/*` maps to `src/*`.
+- The app shell lives in `src/app`; semantic modules live in `src/core`.
+  `@/*` maps to `src/*`.
 - Keep changes small and use feature branches and pull requests.
 - Never commit credentials or `.env` files; they are ignored.
-- Do not add product features during the setup phase.
+- Follow milestone order in [Implementation](docs/IMPLEMENTATION.md).
+
+## Semantic core
+
+All domain edits enter [the command bus](src/core/store/once-store.ts).
+The bus validates actor/channel, payload, references, and phase before applying
+an immutable state transition. Atomic batches commit once and produce an event
+per applied command. A failed batch changes no workspace data; a meaningful
+rejection adds one excluded trace event. Malformed envelopes/payloads and
+unauthorized requests return structured errors without adding activity.
+
+`stateVersion` increases once per committed snapshot, including a rejected event;
+event sequences increase once per trace item. State and trace snapshots are
+frozen to prevent edits outside the command bus.
+
+Persistence uses `once:v1:state`. Invalid or incompatible snapshots fall back to
+the deterministic empty seed. Reset removes only that key. Storage failures do
+not lose the in-memory workspace and are available as an operational warning.
+The store is not yet mounted to the page in M1.
+
+The exact lifecycle command payloads are declared but return `NOT_IMPLEMENTED`
+until M4/M5. Teaching and replay state remain inactive; semantic teaching labels
+are annotations, not a compiler. Approval policy can be stored but no approval
+workflow executes. Required-criterion recommendation eligibility is validated
+in the core using the approved score threshold of 3.
 
 ## Documentation standards
 
