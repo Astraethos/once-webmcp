@@ -52,12 +52,15 @@ For final squash-merge records, follow the
 The merge standard controls merge formatting, not PR review context.
 Agent guidance is in [AGENTS.md](AGENTS.md).
 
+## License
+
+ONCE is licensed under the [MIT License](LICENSE).
+
 ## Follow-ups
 
-- Select an open-source license before accepting contributions or distributing releases.
-  Public visibility alone does not grant an open-source license.
-- Connect Vercel separately when deployment is requested; this scaffold does not
-  create a deployment or Vercel project.
+- Vercel deployment is intentionally deferred until the first meaningful ONCE
+  implementation milestone. Deployment and public HTTPS verification are required
+  before WebMCP end-to-end testing and submission.
 - ESLint is pinned to 9.39.5 because the template's React/import/accessibility
   plugins do not yet support ESLint 10. ESLint 9 is deprecated upstream; upgrade
   the plugin set and ESLint together when compatible releases are available.
