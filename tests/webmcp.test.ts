@@ -118,6 +118,35 @@ describe("M2 shared adapter path", () => {
   });
 });
 
+describe.each([
+  { name: "get_workspace", input: {}, expected: { candidates: [], stateVersion: 0 } },
+  { name: "add_candidates", input: { candidates: [{ name: "Aegis Cloud" }] }, expected: { ok: true, summary: "Added 1 candidate.", stateVersion: 1 } },
+])("$name execution options", ({ name, input, expected }) => {
+  it("executes when options are omitted entirely", () => {
+    const tool = createToolDefinitions(testStore()).find((tool) => tool.name === name)!;
+    expect(tool.execute(input)).toMatchObject(expected);
+  });
+
+  it("executes when options are provided without signal", () => {
+    const tool = createToolDefinitions(testStore()).find((tool) => tool.name === name)!;
+    // Reproduce the native caller's runtime shape without changing the ambient type.
+    expect(Reflect.apply(tool.execute, tool, [input, {}])).toMatchObject(expected);
+  });
+
+  it("preserves cancellation when the supplied signal is already aborted", () => {
+    const store = testStore();
+    const tool = createToolDefinitions(store).find((tool) => tool.name === name)!;
+    const before = store.getState();
+    expect(tool.execute(input, { signal: AbortSignal.abort() })).toEqual({
+      ok: false,
+      error: { code: "ABORTED", message: "The tool call was cancelled before making changes." },
+      stateVersion: before.stateVersion,
+    });
+    expect(store.getState()).toBe(before);
+    expect(store.getState().trace).toEqual([]);
+  });
+});
+
 describe("native registration lifecycle (contract double)", () => {
   it("registers only the two M2 tools with one shared abort signal and no identity schema", async () => {
     const native = registrationDouble();

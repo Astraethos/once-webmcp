@@ -13,7 +13,7 @@ export function createToolDefinitions(store: OnceStore): NativeTool[] {
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
       annotations: { readOnlyHint: true },
       execute(input, options) {
-        if (options?.signal.aborted) return cancelled(store);
+        if (options?.signal?.aborted) return cancelled(store);
         if (!isRecord(input) || Object.keys(input).length !== 0) return invalidInput(store, "Get workspace takes an empty object.");
         const state = store.getState();
         const workspace = state.workspace;
@@ -41,7 +41,7 @@ export function createToolDefinitions(store: OnceStore): NativeTool[] {
         required: ["candidates"], additionalProperties: false,
       },
       execute(input, options) {
-        if (options?.signal.aborted) return cancelled(store);
+        if (options?.signal?.aborted) return cancelled(store);
         if (!isRecord(input) || Object.keys(input).length !== 1 || !Array.isArray(input.candidates) || input.candidates.length < 1 || input.candidates.length > 4) {
           return invalidInput(store, "Provide 1–4 candidates, each with only a non-empty name.");
         }
