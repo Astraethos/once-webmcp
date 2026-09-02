@@ -42,6 +42,16 @@ Run `pnpm start` after building to serve the production build locally.
 - Never commit credentials or `.env` files; they are ignored.
 - Do not add product features during the setup phase.
 
+## Documentation standards
+
+The README is the entry point for the current scaffold and local setup.
+For maintained repository documentation, follow the
+[Clear Technical Documentation Standard](docs/standards/clear-technical-documentation-standard.md).
+For final squash-merge records, follow the
+[GitHub Merge Extended Description Standard](docs/standards/github-merge-extended-description-standard.md).
+The merge standard controls merge formatting, not PR review context.
+Agent guidance is in [AGENTS.md](AGENTS.md).
+
 ## Follow-ups
 
 - Select an open-source license before accepting contributions or distributing releases.
