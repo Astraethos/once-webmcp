@@ -1,7 +1,5 @@
+import { OnceApp } from "../components/shell/once-app";
+
 export default function Home() {
-  return (
-    <main>
-      <div>Hello world!</div>
-    </main>
-  );
+  return <OnceApp />;
 }
