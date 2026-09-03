@@ -19,14 +19,13 @@ export function RoutinePanel() {
     <p className="eyebrow">Memory Rail · {routine ? "Learned routine" : "Teach"}</p>
     <h2 id="routine-heading" ref={heading} tabIndex={-1}>{routine?.name ?? "Routine"}</h2>
     {!routine ? <>
-      <p>No routine taught yet.</p>
-      <p className="muted">Turn this collaboration into a Vendor Evaluation routine. Inputs change, policies stay fixed, and observed work becomes a procedure.</p>
-      <p className="teaching-boundary">One-off corrections are example only — not generalized. ONCE uses defined Vendor Evaluation rules; it does not infer arbitrary workflows.</p>
       <CommandForm label="Teach this routine" command={(data) => ({ type: "TEACH_ROUTINE", payload: { routineName: field(data, "routineName") } })}>
         <label>Routine name<input name="routineName" required defaultValue="Vendor Security Review" /></label>
         <button type="submit">Teach this routine</button>
       </CommandForm>
       <p className="muted teaching-readiness">{readiness?.message ?? "Ready to teach the procedures observed in this collaboration."}</p>
+      <p className="muted">Turn this collaboration into a Vendor Evaluation routine. Inputs change, policies stay fixed, and observed work becomes a procedure.</p>
+      <p className="teaching-boundary">One-off corrections are example only — not generalized. ONCE uses defined Vendor Evaluation rules; it does not infer arbitrary workflows.</p>
     </> : <>
       <p className="form-success" role="status">Routine learned. Review what changes and what stays fixed.</p>
       <ReplayLauncher />

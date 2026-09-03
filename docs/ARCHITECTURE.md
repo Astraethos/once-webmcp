@@ -386,7 +386,7 @@ Payload:
 routineName: non-empty string
 ```
 
-Effect: invokes deterministic compilation of the current collaboration trace and stores the routine. M4 enters `teaching` for routine review and retains the source workspace as read-only. The consent event records the source `collaboration` phase; no synthetic system event is needed. Reset returns to collaboration. Replay execution is deferred to M5.
+Effect: invokes deterministic compilation of the current collaboration trace and stores the routine. M4 enters `teaching` for routine review and retains the source workspace as read-only. The consent event records the source `collaboration` phase; no synthetic system event is needed. Reset returns to collaboration. Human-only replay with new inputs is implemented in M5.
 
 M4 deterministic Vendor Evaluation precondition (approved clarification): teaching requires a valid budget, 2–4 candidates, at least one criterion, and at least one applied collaboration event for an approved procedure (`ATTACH_EVIDENCE`, `SET_SCORE`, `FLAG_UNCERTAINTY`, or `SET_RECOMMENDATION`). No complete evidence/score matrix or recommendation is required.
 
