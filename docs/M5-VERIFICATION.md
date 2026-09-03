@@ -1,6 +1,6 @@
 # M5 Replay and approval verification
 
-> **Document status:** Implementation verification record; release gate pending
+> **Document status:** M5 verification record with an approved external-client exception
 > **Describes:** M5 deterministic Vendor Evaluation replay and human approval
 > **Verification date:** 2026-09-02 (America/Denver)
 > **Authority:** `ARCHITECTURE.md`, `ACCEPTANCE.md`, `IMPLEMENTATION.md`
@@ -125,10 +125,15 @@ focus from the approval banner after reload; the rebuilt page focused
 through the completed flows, rejection, and reloads. No framework error overlay
 was observed.
 
-## External-client release gate
+## External-client release exception — 2026-09-02
 
 These were local native WebMCP invocations in the Codex in-app browser, not
-deployed ChatGPT Work verification. Deployed ChatGPT Work invocation remains
-unverified. The historical M3 exception explicitly authorized M3 only; M5 release
-requires either its deployed verification or explicit approval to carry this
-remaining check to M6. No external-client success is claimed.
+deployed ChatGPT Work verification. Native registration and discovery are
+verified in that local browser, including real read and mutation calls.
+
+The user explicitly approved extending the narrowly scoped external-client
+exception to M5. It covers only deployed native ChatGPT Work WebMCP invocation,
+which remains externally blocked and unverified because the previously
+documented ChatGPT Work browser/runtime policy issue is unresolved. It does not
+waive any other M5 acceptance criterion or GitHub CI. No ChatGPT Work invocation
+success is claimed. A retry during M6 before submission remains mandatory.
