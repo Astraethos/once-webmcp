@@ -2,10 +2,7 @@
 
 **Teach an agent by working with it once.**
 
-ONCE turns a shared Vendor Evaluation into a reusable routine. Work with an
-agent, correct its evaluation, teach what mattered, then replay with new vendors
-and a new budget. The routine preserves your policies and pauses for human
-approval before the final recommendation.
+ONCE explores how one successful human-agent collaboration can become reusable procedural memory. For the OpenAI WebMCP Challenge, ONCE proves that interaction model through a deterministic Vendor Evaluation MVP: human and agent work together once, teach what should persist, replay with new inputs, and stop at the learned human approval boundary.
 
 [Live demo](https://once-webmcp.vercel.app/) ·
 [Demo walkthrough and exact prompts](docs/DEMO.md) ·

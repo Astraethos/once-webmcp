@@ -324,7 +324,11 @@ Final export:
 
 ### One-line pitch
 
-> ONCE turns a human-agent collaboration into a reusable semantic routine: work together once, teach what mattered, replay with new inputs, and stop at the learned human approval boundary.
+> ONCE turns one human-agent collaboration into a reusable semantic routine that can run on new inputs while preserving learned human approval boundaries.
+
+### Short description
+
+ONCE explores reusable procedural memory for agents. Human and agent actions share one semantic history through WebMCP; ONCE deterministically separates changing inputs, fixed policies, repeatable procedures, regenerated outputs, and one-off corrections, then replays the learned routine on new inputs. The competition MVP deliberately limits this idea to Vendor Evaluation and does not claim arbitrary workflow learning.
 
 ### Problem
 
