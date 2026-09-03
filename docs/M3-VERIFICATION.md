@@ -73,6 +73,19 @@ The browser connector stalled on native confirmation-dialog handling. Chrome's
 native accessibility controls completed the reset cancellation and confirmation.
 This was a connector limitation, not an application failure.
 
+## CI and deployed preview
+
+[PR #7 — M3: Complete Vendor Collaboration](https://github.com/Astraethos/once-webmcp/pull/7)
+is open on `feat/m3-collaboration-domain`. Implementation revision
+`db6c8ce737c6ff7b9f6247f494445ea784bc712d` passed
+[GitHub CI](https://github.com/Astraethos/once-webmcp/actions/runs/33698218104)
+and Vercel deployment checks.
+
+The [M3 preview](https://once-webmcp-git-feat-m3-collaboratio-8c53b0-rizzle-technologies.vercel.app/)
+loaded over HTTPS in Chrome, reported all 10 native registrations, and had no
+warning/error console entries. Its workspace was left empty for the native
+ChatGPT Work checkpoint. No production deployment was promoted manually.
+
 ## Deployed integration checkpoint
 
 Pending. The exact first prompt from [Demo](DEMO.md) has not been successfully
