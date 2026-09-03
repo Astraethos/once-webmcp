@@ -8,7 +8,7 @@ import { CollaborationTrace } from "../trace/collaboration-trace";
 
 const capabilityText: Record<WebMCPStatus, string> = {
   checking: "Checking native WebMCP…",
-  ready: "Native WebMCP registered · 2 tools",
+  ready: "Native WebMCP registered · 10 tools",
   unavailable: "WebMCP is unavailable in this browser. You can still use the human workspace.",
   failed: "WebMCP registration failed. Reload in a supported browser; the human workspace remains available.",
   cancelled: "WebMCP registration ended.",
@@ -40,12 +40,15 @@ function WorkspaceShell() {
         <div><h1 className="wordmark">ONCE<span aria-hidden="true">.</span></h1><p className="tagline">Teach an agent by working with it once.</p></div>
         <button className="secondary" onClick={resetDemo}>Reset demo</button>
       </header>
-      <div className="phase-bar"><span className="phase">Collaborate</span><span className="muted">Human + agent · one command bus</span></div>
+      <div className="phase-bar"><span className="phase">Collaborate</span><span className="muted">Human + agent · one shared evaluation</span></div>
       <p className={`capability capability-${webmcp}`} role="status">{capabilityText[webmcp]}</p>
       {persistenceError ? <p className="storage-warning" role="alert">{persistenceError}</p> : null}
       <div className="workspace-layout">
         <EvaluationWorkspace key={`${sessionId}-${resetCount}`} />
-        <CollaborationTrace />
+        <aside className="memory-rail" aria-label="Memory Rail">
+          <CollaborationTrace />
+          <section className="panel routine-empty" aria-labelledby="routine-heading"><p className="eyebrow">Memory Rail</p><h2 id="routine-heading">Routine</h2><p>No routine taught yet.</p><p className="muted">Your collaboration is recorded above. Teaching a reusable routine comes next.</p></section>
+        </aside>
       </div>
       <footer><span>Local demo · no account or external research</span><span>Snapshot {stateVersion}</span></footer>
     </main>

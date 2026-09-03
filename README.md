@@ -3,12 +3,16 @@
 Teach an agent by working with it once.
 
 ONCE is an open-source Vendor Evaluation experiment for the OpenAI WebMCP Challenge.
-The **M2 local vertical slice** is implemented: human candidate entry and native
-WebMCP handlers share one synchronous command bus, workspace, and actor-tagged
-trace. State persists in this browser. The M1 semantic core also includes atomic
-batches and deterministic fictional vendor dossiers.
-Real deployed ChatGPT Work discovery and invocation are **not yet verified**.
-Full evaluation UI/tools, teaching, replay, and approval execution are not implemented.
+The **M3 collaboration workspace** is implemented: human controls and native
+WebMCP handlers share one synchronous command bus, comparison matrix, and
+actor-tagged trace. Budget, criteria, evidence, scores, uncertainty, policy, and
+an initial recommendation persist in this browser. Vendor dossiers are fixed,
+fictional first-party facts.
+Teaching, replay, and approval execution are not implemented.
+M3 is accepted under an explicit external-client release exception. Deployed
+ChatGPT Work invocation remains externally blocked and unverified; it must be
+retried during M6 before final submission. See the
+[M3 verification record](docs/M3-VERIFICATION.md) for the exception and evidence.
 ONCE does not claim arbitrary workflow learning.
 
 ## Stack
@@ -26,8 +30,9 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open http://localhost:3000. Add a vendor candidate and look for its HUMAN trace
-event. Refresh to restore the workspace. **Reset demo** asks for confirmation,
+Open http://localhost:3000. Set a budget, add candidates and criteria, then use
+the comparison cells to attach evidence and score each vendor. Look for HUMAN
+trace events. Refresh to restore the workspace. **Reset demo** asks for confirmation,
 then clears the workspace, trace, and saved snapshot for this origin.
 No environment variables, API keys, database, or paid services are needed.
 
@@ -70,26 +75,33 @@ not lose the in-memory workspace and are available as an operational warning.
 React subscribes through `useSyncExternalStore`; browser restoration and storage
 warnings use server snapshots to keep initial hydration consistent.
 
-## Native WebMCP vertical slice
+## Native WebMCP collaboration
 
 [Native registration](src/webmcp/register-tools.ts) calls
 `document.modelContext.registerTool(tool, { signal })` directly. One
 `AbortController` owns registration cleanup; failed partial registration aborts
 the complete set. There is no wrapper, legacy API fallback, or simulated agent.
 
-[Tool definitions](src/webmcp/tool-definitions.ts) expose only:
+[Tool definitions](src/webmcp/tool-definitions.ts) expose the exact
+[approved contracts](docs/WEBMCP.md):
 
-- `get_workspace`: reads a detached current workspace snapshot without mutation.
-- `add_candidates`: accepts 1–4 names, assigns agent identity internally, and
-  submits one atomic command batch with one semantic event per candidate.
+- Reads: `get_workspace`, `get_vendor_dossier`, and inactive `get_replay_plan`.
+- Mutations: `set_budget`, `add_candidates`, `add_criteria`, `attach_evidence`,
+  `set_scores`, `flag_uncertainty`, and `set_recommendation`.
 
-The [human UI adapter](src/core/store/ui-commands.ts) submits `ADD_CANDIDATE`
-through the same bus with human identity. Tool inputs cannot override actor,
-channel, or generated IDs. Reset and lifecycle actions are not exposed as tools.
+Bulk tools submit atomic command batches and retain one event per item.
+Unknown dossier names return explicit `VENDOR_NOT_FOUND` entries.
+The [human UI adapter](src/core/store/ui-commands.ts) uses the same bus. Human
+controls also change criterion priority/required status, replace evidence, and
+save approval policy. Tool inputs cannot override actor, channel, or generated
+IDs. Reset, policy correction, evidence replacement, and lifecycle actions are
+not exposed as tools.
 
 If WebMCP is unavailable or registration fails, the page shows a notice and the
-human UI remains usable. Registration success alone does not prove agent discovery.
-See the [M2 verification record and required deployed checkpoint](docs/M2-VERIFICATION.md).
+human UI remains usable. Registration success alone does not prove agent discovery
+or invocation. The Memory Rail shows the collaboration trace above an empty
+Routine panel. On narrow screens, it sits below the workspace; the comparison
+matrix scrolls horizontally.
 
 The exact lifecycle command payloads are declared but return `NOT_IMPLEMENTED`
 until M4/M5. Teaching and replay state remain inactive; semantic teaching labels
@@ -113,9 +125,9 @@ ONCE is licensed under the [MIT License](LICENSE).
 
 ## Follow-ups
 
-- The next required human step is to connect/deploy M2 on Vercel and verify native
-  discovery and invocation through ChatGPT Work. Do not start M3 until that gate
-  passes. No deployment or account changes were made during the M1/M2 local work.
+- Retry native ChatGPT Work invocation during M6 before final submission.
+  The M3 release exception does not constitute a successful native invocation.
+- M4 will implement Teach and deterministic routine compilation after M3 release.
 - ESLint is pinned to 9.39.5 because the template's React/import/accessibility
   plugins do not yet support ESLint 10. ESLint 9 is deprecated upstream; upgrade
   the plugin set and ESLint together when compatible releases are available.

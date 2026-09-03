@@ -1,13 +1,14 @@
 import { ACTORS } from "../domain/types";
+import type { Command } from "../domain/commands";
 import type { OnceStore } from "./once-store";
 
 export function addCandidateFromUI(store: OnceStore, name: string) {
-  return store.execute({
-    id: crypto.randomUUID(),
+  return executeFromUI(store, {
     type: "ADD_CANDIDATE",
     payload: { candidateId: crypto.randomUUID(), name },
-    actor: ACTORS.human,
-    channel: "ui",
-    phase: store.getState().phase,
   });
+}
+
+export function executeFromUI(store: OnceStore, command: Command) {
+  return store.execute({ ...command, id: crypto.randomUUID(), actor: ACTORS.human, channel: "ui", phase: store.getState().phase });
 }

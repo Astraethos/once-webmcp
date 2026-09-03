@@ -1,61 +1,62 @@
+import { getVendorDossier } from "../core/demo/vendor-dossiers";
+import type { Command, CommandType } from "../core/domain/commands";
 import { ACTORS } from "../core/domain/types";
-import { isRecord, nonempty } from "../core/domain/validate-command";
+import { isRecord, nonempty, validPayload } from "../core/domain/validate-command";
 import type { OnceStore } from "../core/store/once-store";
 import type { NativeTool } from "../types/webmcp";
+import { toolContracts } from "./tool-contracts";
 import { cancelled, invalidInput } from "./tool-results";
 
 export function createToolDefinitions(store: OnceStore): NativeTool[] {
-  return [
-    {
-      name: "get_workspace",
-      title: "Get workspace",
-      description: "Get the current ONCE vendor-evaluation workspace, including budget, candidates, criteria, evidence, scores, uncertainty, recommendation, phase, and replay status. Call this when you need the current shared state before deciding what to change.",
-      inputSchema: { type: "object", properties: {}, additionalProperties: false },
-      annotations: { readOnlyHint: true },
-      execute(input, options) {
-        if (options?.signal?.aborted) return cancelled(store);
-        if (!isRecord(input) || Object.keys(input).length !== 0) return invalidInput(store, "Get workspace takes an empty object.");
-        const state = store.getState();
-        const workspace = state.workspace;
-        // Return a detached current snapshot, never the trace or a mutable store reference.
-        return structuredClone({
-          phase: state.phase, budget: workspace.budget, candidates: workspace.candidates,
-          criteria: workspace.criteria, evidence: workspace.evidence, scores: workspace.scores,
-          uncertainties: workspace.uncertainties, approvalPolicy: workspace.approvalPolicy,
-          recommendation: workspace.recommendation, replay: state.replay, stateVersion: state.stateVersion,
-        });
-      },
-    },
-    {
-      name: "add_candidates",
-      title: "Add candidates",
-      description: "Add one or more vendor candidates to the current collaboration workspace. Candidate identities become variable inputs when a routine is taught. Do not use this tool to change candidates after replay has started.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          candidates: {
-            type: "array", minItems: 1, maxItems: 4,
-            items: { type: "object", properties: { name: { type: "string", minLength: 1 } }, required: ["name"], additionalProperties: false },
-          },
-        },
-        required: ["candidates"], additionalProperties: false,
-      },
-      execute(input, options) {
-        if (options?.signal?.aborted) return cancelled(store);
-        if (!isRecord(input) || Object.keys(input).length !== 1 || !Array.isArray(input.candidates) || input.candidates.length < 1 || input.candidates.length > 4) {
-          return invalidInput(store, "Provide 1–4 candidates, each with only a non-empty name.");
+  return toolContracts.map((contract) => ({
+    ...contract,
+    execute(input, options) {
+      if (options?.signal?.aborted) return cancelled(store);
+      if (!isRecord(input)) return invalidInput(store, "Provide an object with the documented tool fields.");
+      const state = store.getState();
+      const name = contract.name;
+      if (name === "get_workspace" || name === "get_replay_plan") {
+        if (Object.keys(input).length) return invalidInput(store, "This tool takes an empty object.");
+        if (name === "get_replay_plan") return { active: false, message: "Continue the collaboration. Teaching and replay are not available yet." };
+        const w = state.workspace;
+        return structuredClone({ budget: w.budget, candidates: w.candidates, criteria: [...w.criteria].sort((a, b) => a.priority - b.priority), evidence: w.evidence, scores: w.scores, uncertainties: w.uncertainties, approvalPolicy: w.approvalPolicy, recommendation: w.recommendation, phase: state.phase, replay: state.replay, stateVersion: state.stateVersion });
+      }
+      if (name === "get_vendor_dossier") {
+        if (Object.keys(input).length !== 1 || !Array.isArray(input.vendorNames) || input.vendorNames.length < 1 || input.vendorNames.length > 4 || !input.vendorNames.every(nonempty)) {
+          return invalidInput(store, "Provide 1–4 non-empty vendor names.");
         }
-        const names: string[] = [];
-        for (const item of input.candidates) {
-          if (!isRecord(item) || Object.keys(item).length !== 1 || !nonempty(item.name)) return invalidInput(store, "Every candidate must have only a non-empty name.");
-          names.push(item.name);
+        return { vendors: input.vendorNames.map(getVendorDossier) };
+      }
+
+      // Shape checks are adapter-only. Entity, policy, and phase validation stays
+      // in executeBatch, which commits nothing until every command is valid.
+      let type: CommandType;
+      let items: Record<string, unknown>[];
+      let idField: string | undefined;
+      const batch = name === "add_candidates" ? { key: "candidates", max: 4, type: "ADD_CANDIDATE" as const, id: "candidateId" }
+        : name === "add_criteria" ? { key: "criteria", max: 6, type: "ADD_CRITERION" as const, id: "criterionId" }
+        : name === "attach_evidence" ? { key: "items", max: 12, type: "ATTACH_EVIDENCE" as const, id: "evidenceId" }
+        : name === "set_scores" ? { key: "items", max: 12, type: "SET_SCORE" as const, id: undefined } : null;
+      if (batch) {
+        const values = input[batch.key];
+        if (Object.keys(input).length !== 1 || !Array.isArray(values) || values.length < 1 || values.length > batch.max || !values.every(isRecord)) {
+          return invalidInput(store, `Provide 1–${batch.max} ${batch.key} with the documented fields.`);
         }
-        const result = store.executeBatch(names.map((name) => ({
-          id: crypto.randomUUID(), type: "ADD_CANDIDATE", payload: { candidateId: crypto.randomUUID(), name },
-          actor: ACTORS.agent, channel: "webmcp", phase: store.getState().phase,
-        })));
-        return result.ok ? { ...result, summary: `Added ${names.length} candidate${names.length === 1 ? "" : "s"}.` } : result;
-      },
+        type = batch.type;
+        items = values;
+        idField = batch.id;
+      } else {
+        type = name === "set_budget" ? "SET_BUDGET" : name === "flag_uncertainty" ? "FLAG_UNCERTAINTY" : "SET_RECOMMENDATION";
+        items = [input];
+        idField = name === "flag_uncertainty" ? "uncertaintyId" : undefined;
+      }
+      if (idField && items.some((item) => Object.hasOwn(item, idField!))) return invalidInput(store, "Entity IDs for new items are assigned by ONCE.");
+      const commands = items.map((item) => ({ type, payload: { ...item, ...(idField ? { [idField]: crypto.randomUUID() } : {}) } }));
+      if (commands.some((command) => !validPayload(command.type, command.payload))) return invalidInput(store, "Check the documented fields, text, and numeric ranges for every item.");
+      const result = store.executeBatch(commands.map((command) => ({
+        ...command as Command, id: crypto.randomUUID(), actor: ACTORS.agent, channel: "webmcp", phase: state.phase,
+      })));
+      return result.ok && name === "add_candidates" ? { ...result, summary: `Added ${items.length} candidate${items.length === 1 ? "" : "s"}.` } : result;
     },
-  ];
+  }));
 }

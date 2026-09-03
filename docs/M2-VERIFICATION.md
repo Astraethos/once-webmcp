@@ -5,7 +5,17 @@
 > **Update when:** The deployed ChatGPT Work checkpoint is performed
 > **Authority:** [Acceptance](ACCEPTANCE.md) and [Implementation](IMPLEMENTATION.md)
 
-## Status
+## Subsequent authorization — 2026-09-02
+
+The user conditionally released M2 for M3 implementation. The user reported a
+passing Vercel deployment, native registration in supported Chrome, and ChatGPT
+Work discovery of both M2 tools. Native Work invocation is blocked by an external
+admin-policy verification failure; the Codex Chrome connector has no native
+invocation interface. No application defect was identified. This authorization
+supersedes the original M3 stop instruction below; the original evidence remains
+historical. See [M3 verification](M3-VERIFICATION.md) for subsequent checks.
+
+## Original status
 
 M2 is implemented and verified locally. The mandatory deployed ChatGPT Work
 checkpoint is **not yet verified**. Do not begin M3 until that checkpoint passes.
