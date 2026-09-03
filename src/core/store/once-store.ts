@@ -6,6 +6,7 @@ import { validateCommand } from "../domain/validate-command";
 import type { SemanticEvent } from "../events/types";
 import { summarizeEvent } from "../events/summarize-event";
 import { loadSnapshot, serializeSnapshot, STORAGE_KEY, type StoragePort } from "../persistence/local-storage";
+import { compileRoutine } from "../teaching/compiler";
 import { teachingPolicy } from "../teaching/teaching-policy";
 
 function freeze<T>(value: T): T {
@@ -71,7 +72,15 @@ export function createOnceStore(options: {
         return { ok: false, error, stateVersion: state.stateVersion };
       }
       const request = structuredClone(input);
-      const next = { ...working, workspace: applyCommand(working.workspace, request) };
+      let next: AppState;
+      if (request.type === "TEACH_ROUTINE") {
+        const result = compileRoutine(working, { id: newId(), name: request.payload.routineName, createdAt: now() });
+        // validateCommand has already checked this same immutable source.
+        if (!result.ok) return { ...result, stateVersion: state.stateVersion };
+        next = { ...working, phase: "teaching", teaching: { status: "compiled", routine: result.routine, compilerNotes: result.routine.compilerNotes } };
+      } else {
+        next = { ...working, workspace: applyCommand(working.workspace, request) };
+      }
       const event = eventFor(request, working, next);
       events.push(event);
       working = { ...next, trace: [...working.trace, event] };

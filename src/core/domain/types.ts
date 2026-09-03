@@ -1,4 +1,5 @@
 import type { SemanticEvent } from "../events/types";
+import type { CompilerNote, Routine } from "../teaching/routine-types";
 
 export type ActorKind = "human" | "agent" | "system";
 export type Channel = "ui" | "webmcp" | "system";
@@ -60,8 +61,10 @@ export type AppState = {
   phase: Phase;
   workspace: EvaluationWorkspace;
   trace: SemanticEvent[];
-  // Lifecycle state remains inactive until the compiler and replay milestones.
-  teaching: { status: "idle"; routine: null; compilerNotes: [] };
+  teaching:
+    | { status: "idle"; routine: null; compilerNotes: [] }
+    | { status: "compiled"; routine: Routine; compilerNotes: CompilerNote[] };
+  // Replay execution remains inactive until M5.
   replay: null;
 };
 

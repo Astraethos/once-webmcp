@@ -218,6 +218,17 @@ If a human replaces evidence or changes a score:
 - literal correction is not converted to policy;
 - compiler output remains deterministic.
 
+### M4 deterministic Vendor Evaluation precondition
+
+- Allow Teach with a valid budget, 2–4 candidates, at least one criterion, and at least one observed approved procedure.
+- Return `TEACHING_INCOMPLETE` if any of those requirements is missing.
+- Keep `INVALID_PAYLOAD` for malformed inputs, including blank names.
+- Do not require a complete matrix, all procedure types, or a recommendation.
+- Compile only observed approved procedures; without recommendation, preserve approval policy without inserting a dangling gate.
+- An incomplete Teach must not mutate workspace or teaching state.
+- The learned routine and notes persist across reload; Reset clears both and the saved snapshot.
+- Teach enters routine review; the original workspace remains readable and domain editing is disabled in this phase.
+
 ### Teach consent acceptance
 
 Only human UI can issue `TEACH_ROUTINE`.

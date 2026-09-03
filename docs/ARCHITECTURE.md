@@ -386,7 +386,15 @@ Payload:
 routineName: non-empty string
 ```
 
-Effect: invokes deterministic compilation of the current collaboration trace and stores the routine.
+Effect: invokes deterministic compilation of the current collaboration trace and stores the routine. M4 enters `teaching` for routine review and retains the source workspace as read-only. The consent event records the source `collaboration` phase; no synthetic system event is needed. Reset returns to collaboration. Replay execution is deferred to M5.
+
+M4 deterministic Vendor Evaluation precondition (approved clarification): teaching requires a valid budget, 2–4 candidates, at least one criterion, and at least one applied collaboration event for an approved procedure (`ATTACH_EVIDENCE`, `SET_SCORE`, `FLAG_UNCERTAINTY`, or `SET_RECOMMENDATION`). No complete evidence/score matrix or recommendation is required.
+
+If a requirement is missing, return `TEACHING_INCOMPLETE` with:
+
+> To teach, set a budget, add 2–4 candidates and at least one criterion, then collect evidence, score, flag uncertainty, or recommend.
+
+Malformed input, including a blank routine name or structurally invalid payload, returns the existing `INVALID_PAYLOAD`. Standard actor/channel and phase validation still applies. An incomplete Teach adds an excluded rejection event and changes neither the workspace nor teaching state.
 
 Never teachable. Never WebMCP-exposed.
 
@@ -781,7 +789,7 @@ It produces a canonical Vendor Evaluation routine.
 5. if evidence attachment occurred, compile an evidence-collection loop over every replay candidate × criterion.
 6. if scoring occurred, compile a scoring loop over every replay candidate × criterion.
 7. if uncertainty was flagged at least once, compile an optional uncertainty-check step.
-8. if approval policy requires it, insert a human approval gate before final recommendation.
+8. if approval policy requires it and a recommendation procedure was observed, insert a human approval gate before final recommendation. Otherwise preserve the approval policy without inventing a recommendation or a dangling gate.
 9. if a recommendation occurred, compile a final recommendation step.
 10. human evidence replacements and manual score corrections produce compiler notes marked `example_only`; their literal values are not generalized.
 
@@ -800,6 +808,8 @@ ONCE additionally:
 - validates future agent actions against the resulting procedure.
 
 The compiler is still intentionally narrow.
+
+Compilation is pure and deterministic for the same source snapshot, routine name, and supplied identity/time metadata. The command bus supplies `id` and `createdAt`; these are metadata, not procedure inputs. Criterion and step identifiers are canonical and do not copy source entity/event IDs. Notes are deduplicated by correction type in a fixed order. Persistence validates a compiled snapshot by recompiling its retained source with the saved metadata and comparing the complete routine, so malformed routine fields or extra generated values are discarded with the snapshot.
 
 ## Routine representation
 

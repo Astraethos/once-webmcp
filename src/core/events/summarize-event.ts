@@ -19,6 +19,7 @@ export function summarizeEvent(command: CommandRequest, w: EvaluationWorkspace):
     case "FLAG_UNCERTAINTY": return `Flagged uncertainty: ${command.payload.note}`;
     case "SET_APPROVAL_POLICY": return command.payload.requiredBeforeRecommendation ? "Required approval before final recommendation" : "Disabled approval-before-recommendation policy";
     case "SET_RECOMMENDATION": return `Recommended ${candidate(command.payload.candidateId)}`;
+    case "TEACH_ROUTINE": return `Taught routine: ${command.payload.routineName.trim()}`;
     default: return "Lifecycle action unavailable";
   }
 }
