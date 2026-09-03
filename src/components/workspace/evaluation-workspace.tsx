@@ -1,15 +1,20 @@
 import { useOnceState } from "../../core/store/once-provider";
 import { CandidateMatrix } from "./candidate-matrix";
 import { CommandForm, field } from "./command-form";
+import { ReplayStatus } from "../replay/replay-status";
+import { ApprovalBanner } from "../replay/approval-banner";
 
 export function EvaluationWorkspace() {
-  const { workspace: w } = useOnceState();
+  const { workspace: w, phase, replay } = useOnceState();
   const recommendation = w.recommendation;
   const recommended = w.candidates.find((c) => c.id === recommendation?.candidateId);
   const unmet = recommendation && w.criteria.some((c) => c.required && !w.scores.some((s) => s.candidateId === recommendation.candidateId && s.criterionId === c.id && s.score >= 3));
   return <section className="panel workspace" aria-labelledby="workspace-heading">
     <div className="section-heading"><div><p className="eyebrow">Shared workspace</p><h2 id="workspace-heading">{w.title}</h2></div><span className="count">{w.candidates.length} candidates · {w.criteria.length} criteria</span></div>
     <p className="muted">Compare fictional vendors using ONCE’s first-party dossiers. You and your agent share the evidence and decisions.</p>
+    <ReplayStatus />
+    <ApprovalBanner />
+    <fieldset className="workspace-controls" disabled={phase !== "collaboration"}><legend className="sr-only">Vendor evaluation controls</legend>
     <div className="budget-heading"><h3>Annual budget</h3><strong>{w.budget.amount === null ? "Not set" : new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(w.budget.amount)}</strong></div>
     <CommandForm key={w.budget.amount} label="Set budget" command={(data) => ({ type: "SET_BUDGET", payload: { amount: Number(field(data, "amount")), currency: "USD" } })}>
       <label>Budget (USD)<input type="number" name="amount" min="0" step="any" defaultValue={w.budget.amount ?? ""} required placeholder="24000" /></label><button type="submit">Save budget</button>
@@ -28,14 +33,15 @@ export function EvaluationWorkspace() {
         <label>Uncertainty note<textarea name="note" required rows={2} /></label><button type="submit">Flag uncertainty</button>
       </CommandForm></details>
     </section>
-    <section className="workspace-section recommendation" aria-labelledby="recommendation-heading"><p className="eyebrow">Current collaboration</p><h3 id="recommendation-heading">Initial recommendation</h3>
+    <section className="workspace-section recommendation" aria-labelledby="recommendation-heading"><p className="eyebrow">{replay ? "Current replay" : "Current collaboration"}</p><h3 id="recommendation-heading">{replay ? "Final recommendation" : "Initial recommendation"}</h3>
       {recommendation ? <><h4>{recommended?.name}</h4><p>{recommendation.rationale}</p>{unmet ? <p className="error" role="status">This earlier recommendation no longer meets the required criteria. Review the scores and update the recommendation.</p> : null}</> : <p className="muted">No recommendation yet.</p>}
       {!!w.candidates.length && <details><summary>{recommendation ? "Update recommendation" : "Set recommendation"}</summary><CommandForm key={JSON.stringify(recommendation)} label="Set recommendation" command={(data) => ({ type: "SET_RECOMMENDATION", payload: { candidateId: field(data, "candidateId"), rationale: field(data, "rationale") } })}>
         <label>Recommended candidate<select name="candidateId" defaultValue={recommendation?.candidateId}>{w.candidates.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label><label>Recommendation rationale<textarea name="rationale" defaultValue={recommendation?.rationale} required rows={3} /></label><button type="submit">Save recommendation</button>
       </CommandForm></details>}
     </section>
-    <section className="workspace-section approval-policy"><h3>Human approval policy</h3><p className="muted">Save a policy for a future routine. Approval will be enforced during replay; this collaboration keeps its initial recommendation.</p>
+    <section className="workspace-section approval-policy"><h3>Human approval policy</h3><p className="muted">{replay ? (w.approvalPolicy.requiredBeforeRecommendation ? "Learned policy: human approval is required before final recommendation." : "Learned policy: no approval gate is required.") : "Save a policy for a future routine. Approval will be enforced during replay; this collaboration keeps its initial recommendation."}</p>
       <CommandForm key={String(w.approvalPolicy.requiredBeforeRecommendation)} label="Human approval policy" command={(data) => ({ type: "SET_APPROVAL_POLICY", payload: { requiredBeforeRecommendation: data.has("required") } })}><label className="checkbox-label"><input type="checkbox" name="required" defaultChecked={w.approvalPolicy.requiredBeforeRecommendation} />Require human approval before final recommendation</label><button type="submit" className="secondary">Save approval policy</button></CommandForm>
     </section>
+    </fieldset>
   </section>;
 }

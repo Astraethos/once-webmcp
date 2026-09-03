@@ -257,6 +257,15 @@ Starting replay:
 - contains no old evidence, scores, uncertainty, or recommendation;
 - sets replay status running.
 
+### Replay readiness acceptance
+
+- Scoring-only routines can still be taught and displayed.
+- Start rejects scoring without evidence collection with `REPLAY_ROUTINE_INCOMPLETE`.
+- Start rejects recommendation with required criteria but no scoring with the same code.
+- These rejections leave workspace and replay state unchanged and explain the missing prerequisite.
+- Evidence collection plus scoring passes readiness; adding recommendation and required criteria still passes.
+- No missing procedure is injected. Teach preconditions and procedure definitions remain unchanged.
+
 ### Replay plan acceptance
 
 `get_replay_plan` reports:

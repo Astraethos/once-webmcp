@@ -262,8 +262,8 @@ Expected agent behavior:
 2. `get_workspace`
 3. `get_vendor_dossier`
 4. `attach_evidence`
-5. `set_scores`
-6. optional `flag_uncertainty`
+5. optional `flag_uncertainty` before the final required output
+6. `set_scores`
 7. `get_replay_plan`
 
 After evidence and scores are complete, ONCE automatically emits:
@@ -291,9 +291,11 @@ Human clicks **Approve**.
 Expected trace:
 
 ```text
-HUMAN  Approved final recommendation
-ONCE   Replay resumed
+HUMAN  Approved final recommendation · replay resumed
 ```
+
+Approval and resume are one `RECORD_APPROVAL` transition. The exact semantic
+command surface has no separate system resume command.
 
 Work then calls `set_recommendation`.
 

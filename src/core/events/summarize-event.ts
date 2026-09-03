@@ -20,6 +20,9 @@ export function summarizeEvent(command: CommandRequest, w: EvaluationWorkspace):
     case "SET_APPROVAL_POLICY": return command.payload.requiredBeforeRecommendation ? "Required approval before final recommendation" : "Disabled approval-before-recommendation policy";
     case "SET_RECOMMENDATION": return `Recommended ${candidate(command.payload.candidateId)}`;
     case "TEACH_ROUTINE": return `Taught routine: ${command.payload.routineName.trim()}`;
-    default: return "Lifecycle action unavailable";
+    case "START_REPLAY": return `Started replay: ${w.candidates.map((c) => c.name).join(" / ")} · $${w.budget.amount!.toLocaleString("en-US")} USD`;
+    case "REQUEST_APPROVAL": return "Replay paused: human approval required";
+    case "RECORD_APPROVAL": return command.payload.decision === "approved" ? "Approved final recommendation · replay resumed" : "Rejected final recommendation · replay stopped";
+    case "COMPLETE_REPLAY": return "Replay complete";
   }
 }

@@ -37,6 +37,6 @@ export function applyCommand(workspace: EvaluationWorkspace, command: Command): 
     }
     case "SET_APPROVAL_POLICY": return { ...w, approvalPolicy: { ...command.payload } };
     case "SET_RECOMMENDATION": return { ...w, recommendation: { ...command.payload } };
-    default: throw new Error("Lifecycle execution is deferred; validate commands before applying them.");
+    default: throw new Error("Lifecycle commands must use the semantic state application path.");
   }
 }

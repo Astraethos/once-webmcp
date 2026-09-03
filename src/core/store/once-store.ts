@@ -1,13 +1,13 @@
 import { createDemoSeed } from "../demo/seed";
 import type { CommandRequest } from "../domain/commands";
-import { applyCommand } from "../domain/apply-command";
-import type { AppState, CommandError, CommandResult } from "../domain/types";
+import { applyStateCommand } from "../domain/apply-state-command";
+import { ACTORS, type AppState, type CommandError, type CommandResult } from "../domain/types";
 import { validateCommand } from "../domain/validate-command";
 import type { SemanticEvent } from "../events/types";
 import { summarizeEvent } from "../events/summarize-event";
 import { loadSnapshot, serializeSnapshot, STORAGE_KEY, type StoragePort } from "../persistence/local-storage";
-import { compileRoutine } from "../teaching/compiler";
 import { teachingPolicy } from "../teaching/teaching-policy";
+import { nextReplayCommand } from "../replay/replay-engine";
 
 function freeze<T>(value: T): T {
   if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {
@@ -47,7 +47,7 @@ export function createOnceStore(options: {
     return {
       schemaVersion: 1, eventId: newId(), sequence: before.trace.length + 1,
       timestamp: now(), sessionId: before.sessionId,
-      ...(request.replayRunId ? { replayRunId: request.replayRunId } : {}),
+      ...((after.replay ?? before.replay) ? { replayRunId: (after.replay ?? before.replay)!.runId } : {}),
       actor: { ...request.actor }, channel: request.channel, phase: before.phase,
       command: { id: request.id, type: request.type, payload: structuredClone(request.payload) },
       outcome: error ? "rejected" : "applied",
@@ -55,6 +55,13 @@ export function createOnceStore(options: {
       teaching: error ? { disposition: "excluded", reason: "Rejected commands are not teaching examples." } : teachingPolicy(request, before.workspace),
       ...(error ? { error } : {}),
     };
+  }
+
+  function replayResult() {
+    const run = state.replay;
+    if (!run) return {};
+    const next = run.status === "running" ? run.stepStatus.find((step) => step.status === "active")?.stepId : undefined;
+    return { replay: { status: run.status, ...(next ? { next } : {}) } };
   }
 
   function executeBatch(requests: readonly CommandRequest[]): CommandResult {
@@ -69,24 +76,29 @@ export function createOnceStore(options: {
           const event = eventFor(input, state, state, error);
           commit({ ...state, stateVersion: state.stateVersion + 1, trace: [...state.trace, event] });
         }
-        return { ok: false, error, stateVersion: state.stateVersion };
+        return { ok: false, error, stateVersion: state.stateVersion, ...replayResult() };
       }
       const request = structuredClone(input);
-      let next: AppState;
-      if (request.type === "TEACH_ROUTINE") {
-        const result = compileRoutine(working, { id: newId(), name: request.payload.routineName, createdAt: now() });
-        // validateCommand has already checked this same immutable source.
-        if (!result.ok) return { ...result, stateVersion: state.stateVersion };
-        next = { ...working, phase: "teaching", teaching: { status: "compiled", routine: result.routine, compilerNotes: result.routine.compilerNotes } };
-      } else {
-        next = { ...working, workspace: applyCommand(working.workspace, request) };
-      }
+      const next = applyStateCommand(working, request, { id: request.type === "TEACH_ROUTINE" || request.type === "START_REPLAY" ? newId() : request.id, timestamp: now() });
       const event = eventFor(request, working, next);
       events.push(event);
       working = { ...next, trace: [...working.trace, event] };
+      // System progression stays in the same atomic command/event pipeline.
+      // A later invalid batch item rolls back these lifecycle events too.
+      let automatic = nextReplayCommand(working);
+      while (automatic) {
+        const systemRequest: CommandRequest = { ...automatic, id: newId(), actor: ACTORS.system, channel: "system", phase: working.phase, replayRunId: working.replay!.runId, causationId: request.id };
+        const invalid = validateCommand(working, systemRequest);
+        if (invalid) throw new Error(`Invalid automatic replay transition: ${invalid.code}`);
+        const progressed = applyStateCommand(working, systemRequest, { id: systemRequest.id, timestamp: now() });
+        const systemEvent = eventFor(systemRequest, working, progressed);
+        events.push(systemEvent);
+        working = { ...progressed, trace: [...working.trace, systemEvent] };
+        automatic = nextReplayCommand(working);
+      }
     }
     commit({ ...working, stateVersion: state.stateVersion + 1 });
-    return { ok: true, eventIds: events.map((e) => e.eventId), summary: events.length === 1 ? events[0].summary : `Applied ${events.length} semantic actions.`, stateVersion: state.stateVersion };
+    return { ok: true, eventIds: events.map((e) => e.eventId), summary: events.length === 1 ? events[0].summary : `Applied ${events.length} semantic actions.`, stateVersion: state.stateVersion, ...replayResult() };
   }
 
   return {

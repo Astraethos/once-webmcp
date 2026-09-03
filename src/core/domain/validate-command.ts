@@ -1,5 +1,6 @@
 import { HUMAN_ONLY, LIFECYCLE, SYSTEM_ONLY, type CommandRequest, type CommandType } from "./commands";
 import { validateTeaching } from "../teaching/validate-teaching";
+import { validateReplayCommand } from "../replay/replay-engine";
 import { ACTORS, type AppState, type CommandError } from "./types";
 
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -72,6 +73,8 @@ export function validateCommand(state: AppState, request: CommandRequest): Comma
   }
   const w = state.workspace;
   const p = request.payload;
+  if (request.phase !== state.phase) return error("INVALID_PHASE", "The command phase does not match the current workspace.");
+  if (state.replay && ["rejected", "completed", "failed"].includes(state.replay.status)) return error("INVALID_REPLAY_STATE", "This replay has ended. Further workspace changes are blocked.");
   if ("candidateId" in p && request.type !== "ADD_CANDIDATE" && p.candidateId !== undefined && !w.candidates.some((c) => c.id === p.candidateId)) {
     return error("CANDIDATE_NOT_FOUND", "The referenced candidate does not exist.");
   }
@@ -98,8 +101,7 @@ export function validateCommand(state: AppState, request: CommandRequest): Comma
       if (w.criteria.some((c) => c.required && !w.scores.some((s) => s.candidateId === request.payload.candidateId && s.criterionId === c.id && s.score >= 3))) return error("REQUIRED_CRITERION_FAILED", "The candidate must score at least 3 on every required criterion.");
       break;
   }
-  if (request.phase !== state.phase) return error("INVALID_PHASE", "The command phase does not match the current workspace.");
-  if (LIFECYCLE.includes(request.type) && request.type !== "TEACH_ROUTINE") return error("NOT_IMPLEMENTED", "Replay and approval execution are not available in this milestone.");
+  if ((LIFECYCLE.includes(request.type) && request.type !== "TEACH_ROUTINE") || state.replay) return validateReplayCommand(state, request);
   if (state.phase !== "collaboration" || request.replayRunId !== undefined) return error("INVALID_PHASE", "This command requires an active collaboration workspace.");
   if (request.type === "TEACH_ROUTINE") return validateTeaching(state, request.payload.routineName);
   return null;

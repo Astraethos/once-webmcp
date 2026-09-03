@@ -128,3 +128,24 @@ summary { cursor: pointer; font-weight: 600; color: var(--green); }
 .example-only ul { padding-left: 18px; margin-bottom: 0; }
 .example-only li + li { margin-top: 10px; }
 .teaching-boundary, .teaching-readiness { font-size: 12px; }
+
+/* M5 replay progress and the human-only review boundary. */
+.workspace-controls:disabled .command-form, .workspace-controls:disabled .cell-editor, .workspace-controls:disabled .setup-controls, .workspace-controls:disabled .workspace-section > details { display: none; }
+.replay-launcher { margin: 20px 0; padding: 16px; background: #edf3e9; border: 1px solid #b7cdb3; border-radius: 8px; font-size: 13px; }
+.readiness-note { color: #775417; }
+.replay-status { margin: 20px 0; padding: 18px; background: #f2f5ed; border: 1px solid var(--line); border-radius: 8px; }
+.replay-status p { font-size: 13px; }
+.replay-steps { list-style: none; padding: 0; margin: 12px 0; }
+.replay-steps li { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding: 8px 0; font-size: 12px; }
+.replay-steps strong { flex-shrink: 0; font-weight: 600; }
+.step-active { color: var(--green); font-weight: 700; }
+.step-skipped, .step-pending { color: var(--muted); }
+.approval-banner { margin: 22px 0; padding: 22px; border: 2px solid #a36d20; border-radius: 10px; background: #fff2d8; }
+.approval-banner h3 { font-size: 23px; }
+.approval-banner h3:focus-visible { outline: 3px solid #9a6a19; outline-offset: 4px; }
+.approval-banner p, .approval-banner li { font-size: 14px; }
+.approval-banner ul { padding-left: 18px; }
+.approval-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.approval-actions .command-form { margin: 0; }
+.approval-actions button { padding: 11px 22px; font-size: 15px; }
+@media (max-width: 760px) { .replay-steps li { flex-wrap: wrap; gap: 3px; } .approval-banner { padding: 16px; } }
