@@ -1,9 +1,15 @@
+import { useEffect, useRef } from "react";
 import { useOnceState } from "../../core/store/once-provider";
 
 const labels = { human: "HUMAN", agent: "AGENT", system: "ONCE" } as const;
 
 export function CollaborationTrace() {
   const { trace } = useOnceState();
+  const log = useRef<HTMLDivElement>(null);
+  const followLatest = useRef(true);
+  useEffect(() => {
+    if (log.current && followLatest.current) log.current.scrollTop = log.current.scrollHeight;
+  }, [trace.length]);
   return (
     <section className="panel trace" aria-labelledby="trace-heading">
       <div className="section-heading">
@@ -11,7 +17,10 @@ export function CollaborationTrace() {
         <span className="count">{trace.length}</span>
       </div>
       <p className="muted">What changed, and who changed it.</p>
-      <div role="log" aria-label="Semantic activity" aria-live="polite" aria-relevant="additions">
+      <div ref={log} role="log" tabIndex={0} aria-label="Semantic activity" aria-live="polite" aria-relevant="additions" onScroll={(event) => {
+        const element = event.currentTarget;
+        followLatest.current = element.scrollHeight - element.scrollTop - element.clientHeight < 40;
+      }}>
         {trace.length === 0 ? <p className="trace-empty">No actions yet. Your first change will appear here.</p> : (
           <ol className="trace-list">
             {trace.map((event) => (

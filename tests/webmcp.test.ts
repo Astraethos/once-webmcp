@@ -148,11 +148,11 @@ describe.each([
 });
 
 describe("native registration lifecycle (contract double)", () => {
-  it("registers only the two M2 tools with one shared abort signal and no identity schema", async () => {
+  it("registers the ten approved tools with one shared abort signal and no identity schema", async () => {
     const native = registrationDouble();
     const registration = registerTools(testStore());
     expect(await registration.ready).toBe("ready");
-    expect([...native.tools.keys()]).toEqual(["get_workspace", "add_candidates"]);
+    expect([...native.tools.keys()]).toEqual(["get_workspace", "add_candidates", "get_vendor_dossier", "get_replay_plan", "set_budget", "add_criteria", "attach_evidence", "set_scores", "flag_uncertainty", "set_recommendation"]);
     expect(native.signals[0]).toBe(native.signals[1]);
     for (const tool of native.tools.values()) {
       expect(JSON.stringify(tool.inputSchema)).not.toMatch(/actor|channel/);
@@ -172,7 +172,7 @@ describe("native registration lifecycle (contract double)", () => {
     first.dispose();
     const second = registerTools(store);
     expect(await second.ready).toBe("ready");
-    expect(native.tools.size).toBe(2);
+    expect(native.tools.size).toBe(10);
     second.dispose();
   });
 
@@ -184,7 +184,7 @@ describe("native registration lifecycle (contract double)", () => {
     const second = registerTools(store);
     expect(await first.ready).toBe("cancelled");
     expect(await second.ready).toBe("ready");
-    expect(native.tools.size).toBe(2);
+    expect(native.tools.size).toBe(10);
     second.dispose();
   });
 
