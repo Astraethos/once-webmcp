@@ -1,5 +1,6 @@
 import type { SemanticEvent } from "../events/types";
 import type { CompilerNote, Routine } from "../teaching/routine-types";
+import type { ReplayState } from "../replay/replay-types";
 
 export type ActorKind = "human" | "agent" | "system";
 export type Channel = "ui" | "webmcp" | "system";
@@ -64,11 +65,11 @@ export type AppState = {
   teaching:
     | { status: "idle"; routine: null; compilerNotes: [] }
     | { status: "compiled"; routine: Routine; compilerNotes: CompilerNote[] };
-  // Replay execution remains inactive until M5.
-  replay: null;
+  replay: ReplayState | null;
 };
 
 export type CommandError = { code: string; message: string };
-export type CommandResult =
+export type CommandResult = (
   | { ok: true; eventIds: string[]; summary: string; stateVersion: number }
-  | { ok: false; error: CommandError; stateVersion: number };
+  | { ok: false; error: CommandError; stateVersion: number }
+) & { replay?: { status: ReplayState["status"]; next?: string } };

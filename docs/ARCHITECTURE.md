@@ -811,6 +811,14 @@ The compiler is still intentionally narrow.
 
 Compilation is pure and deterministic for the same source snapshot, routine name, and supplied identity/time metadata. The command bus supplies `id` and `createdAt`; these are metadata, not procedure inputs. Criterion and step identifiers are canonical and do not copy source entity/event IDs. Notes are deduplicated by correction type in a fixed order. Persistence validates a compiled snapshot by recompiling its retained source with the saved metadata and comparing the complete routine, so malformed routine fields or extra generated values are discarded with the snapshot.
 
+During replay, the current workspace has replaced the source workspace. Snapshot
+validation recovers the source from typed applied collaboration commands and
+validates the saved replay transitions with the same pure command rules. It
+compares the rebuilt workspace, routine, phase, and replay state with the saved
+snapshot. This validation performs no live commands, writes, or tool calls and
+never interprets natural-language summaries. A mismatched policy, progress,
+approval decision, or lifecycle sequence falls back to the seed.
+
 ## Routine representation
 
 ```ts
@@ -920,6 +928,25 @@ The routine does not contain literal tool-call transcripts.
 
 ## Replay model
 
+### M5 replay readiness (approved clarification)
+
+Teach remains permissive: a compiled routine may be displayed even when it is
+not independently replayable. Before `START_REPLAY` changes workspace or replay
+state, reject with `REPLAY_ROUTINE_INCOMPLETE` when:
+
+1. Scoring was learned without evidence collection. Message:
+   “Replay can’t start because scoring was learned without evidence collection.”
+2. Recommendation was learned, at least one criterion is required, and scoring
+   was not learned. Message:
+   “Replay can’t start because recommendation requires scoring to evaluate required criteria.”
+
+Evaluate these checks in that order. The rejected semantic event is excluded
+from teaching. Do not change Teach preconditions, inject missing procedures,
+or execute unlearned prerequisite work. These are two Vendor Evaluation checks,
+not a generic dependency solver.
+
+### Agent-driven execution
+
 A WebMCP website cannot directly order an external browser agent to call its tools.
 
 Therefore ONCE replay works as a protocol:
@@ -991,6 +1018,22 @@ During replay:
 - `SET_RECOMMENDATION` is rejected before required approval;
 - after rejection, agent mutation commands are rejected;
 - completion occurs only when required steps are satisfied.
+
+M5 starts replay from the `teaching` review phase and enters `replay` directly.
+The input form is transient UI, not a second replay state machine. Reset is the
+recovery path after a terminal run; no retry/remediation workflow is added.
+Evidence and scores can be filled pair-by-pair before the gate, subject to the
+evidence-before-score invariant. Optional uncertainty must be flagged before the
+last required pre-approval output; otherwise its step is skipped. At the gate,
+agent output edits are locked as well, preserving the exact workspace reviewed
+by the human. After approval, only the learned recommendation can mutate it.
+Routines without recommendation complete after their learned required work;
+they do not invent a recommendation or an approval gate.
+
+`RECORD_APPROVAL` both records the human decision and resumes or rejects the
+run. Its HUMAN trace summary includes that result. There is no separate resume
+command or synthetic ONCE resume event. `COMPLETE_REPLAY` enters application
+phase `complete`; its event records the originating `replay` phase.
 
 ## Approval state machine
 

@@ -6,6 +6,7 @@ import type { OnceStore } from "../core/store/once-store";
 import type { NativeTool } from "../types/webmcp";
 import { toolContracts } from "./tool-contracts";
 import { cancelled, invalidInput } from "./tool-results";
+import { getReplayPlan } from "../core/replay/replay-engine";
 
 export function createToolDefinitions(store: OnceStore): NativeTool[] {
   return toolContracts.map((contract) => ({
@@ -17,7 +18,7 @@ export function createToolDefinitions(store: OnceStore): NativeTool[] {
       const name = contract.name;
       if (name === "get_workspace" || name === "get_replay_plan") {
         if (Object.keys(input).length) return invalidInput(store, "This tool takes an empty object.");
-        if (name === "get_replay_plan") return { active: false, message: "Continue the collaboration. Teaching and replay are not available yet." };
+        if (name === "get_replay_plan") return getReplayPlan(state);
         const w = state.workspace;
         return structuredClone({ budget: w.budget, candidates: w.candidates, criteria: [...w.criteria].sort((a, b) => a.priority - b.priority), evidence: w.evidence, scores: w.scores, uncertainties: w.uncertainties, approvalPolicy: w.approvalPolicy, recommendation: w.recommendation, phase: state.phase, replay: state.replay, stateVersion: state.stateVersion });
       }
@@ -55,6 +56,7 @@ export function createToolDefinitions(store: OnceStore): NativeTool[] {
       if (commands.some((command) => !validPayload(command.type, command.payload))) return invalidInput(store, "Check the documented fields, text, and numeric ranges for every item.");
       const result = store.executeBatch(commands.map((command) => ({
         ...command as Command, id: crypto.randomUUID(), actor: ACTORS.agent, channel: "webmcp", phase: state.phase,
+        ...(state.replay ? { replayRunId: state.replay.runId } : {}),
       })));
       return result.ok && name === "add_candidates" ? { ...result, summary: `Added ${items.length} candidate${items.length === 1 ? "" : "s"}.` } : result;
     },

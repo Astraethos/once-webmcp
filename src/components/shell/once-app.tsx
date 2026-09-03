@@ -17,7 +17,7 @@ const capabilityText: Record<WebMCPStatus, string> = {
 
 function WorkspaceShell() {
   const store = useOnceStore();
-  const { sessionId, stateVersion, phase } = useOnceState();
+  const { sessionId, stateVersion, phase, replay } = useOnceState();
   const [webmcp, setWebmcp] = useState<WebMCPStatus>("checking");
   const [resetCount, setResetCount] = useState(0);
   const persistenceError = useSyncExternalStore(store.subscribe, store.getPersistenceError, () => null);
@@ -30,7 +30,7 @@ function WorkspaceShell() {
   }, [store]);
 
   function resetDemo() {
-    if (!window.confirm("Reset the demo? This clears the workspace, collaboration trace, and learned routine saved in this browser.")) return;
+    if (!window.confirm("Reset the demo? This clears the workspace, collaboration trace, learned routine, and replay saved in this browser.")) return;
     store.resetDemo();
     setResetCount((count) => count + 1);
   }
@@ -41,11 +41,14 @@ function WorkspaceShell() {
         <div><h1 className="wordmark">ONCE<span aria-hidden="true">.</span></h1><p className="tagline">Teach an agent by working with it once.</p></div>
         <button className="secondary" onClick={resetDemo}>Reset demo</button>
       </header>
-      <div className="phase-bar"><span className="phase">{phase === "teaching" ? "Teach" : "Collaborate"}</span><span className="muted">{phase === "teaching" ? "Learned routine · review what carries forward" : "Human + agent · one shared evaluation"}</span></div>
+      <nav className="phase-bar" aria-label="Evaluation phases">{["Collaborate", "Teach", "Replay", "Approve", "Complete"].map((label) => {
+        const current = phase === "complete" ? "Complete" : replay?.status === "awaiting_approval" ? "Approve" : phase === "replay" ? "Replay" : phase === "teaching" ? "Teach" : "Collaborate";
+        return <span key={label} className={label === current ? "phase" : "muted"} aria-current={label === current ? "step" : undefined}>{label}</span>;
+      })}</nav>
       <p className={`capability capability-${webmcp}`} role="status">{capabilityText[webmcp]}</p>
       {persistenceError ? <p className="storage-warning" role="alert">{persistenceError}</p> : null}
       <div className="workspace-layout">
-        <fieldset className="workspace-controls" disabled={phase === "teaching"}><legend className="sr-only">Vendor evaluation controls</legend><EvaluationWorkspace key={`${sessionId}-${resetCount}`} /></fieldset>
+        <EvaluationWorkspace key={`${sessionId}-${resetCount}-${replay?.runId ?? "collaboration"}`} />
         <aside className="memory-rail" aria-label="Memory Rail">
           <CollaborationTrace />
           <RoutinePanel key={`${sessionId}-${resetCount}`} />

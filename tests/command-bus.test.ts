@@ -164,11 +164,11 @@ describe("semantic command bus", () => {
     expect(store.getState()).toEqual(createDemoSeed());
   });
 
-  it("rejects stale phases and unavailable lifecycle actions", () => {
+  it("rejects stale phases and lifecycle actions without an active replay", () => {
     const store = testStore();
     expect(store.execute({ ...request(candidate), phase: "replay" })).toMatchObject({ error: { code: "INVALID_PHASE" } });
     expect(store.execute(request({ type: "TEACH_ROUTINE", payload: { routineName: "Review" } }))).toMatchObject({ error: { code: "TEACHING_INCOMPLETE" } });
-    expect(store.execute(request({ type: "REQUEST_APPROVAL", payload: { runId: "r", gateId: "g", message: "Review" } }, "system"))).toMatchObject({ error: { code: "NOT_IMPLEMENTED" } });
+    expect(store.execute(request({ type: "REQUEST_APPROVAL", payload: { runId: "r", gateId: "g", message: "Review" } }, "system"))).toMatchObject({ error: { code: "INVALID_REPLAY_STATE" } });
     expect(store.getState().trace.at(-1)?.actor.kind).toBe("system");
   });
 

@@ -10,5 +10,6 @@ export function addCandidateFromUI(store: OnceStore, name: string) {
 }
 
 export function executeFromUI(store: OnceStore, command: Command) {
-  return store.execute({ ...command, id: crypto.randomUUID(), actor: ACTORS.human, channel: "ui", phase: store.getState().phase });
+  const state = store.getState();
+  return store.execute({ ...command, id: crypto.randomUUID(), actor: ACTORS.human, channel: "ui", phase: state.phase, ...(state.replay ? { replayRunId: state.replay.runId } : {}) });
 }

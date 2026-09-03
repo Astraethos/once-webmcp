@@ -3,6 +3,7 @@ import { useOnceState } from "../../core/store/once-provider";
 import { validateTeaching } from "../../core/teaching/validate-teaching";
 import { CommandForm, field } from "../workspace/command-form";
 import { RoutineStep } from "./routine-step";
+import { ReplayLauncher } from "../replay/replay-launcher";
 
 export function RoutinePanel() {
   const state = useOnceState();
@@ -10,9 +11,9 @@ export function RoutinePanel() {
   const heading = useRef<HTMLHeadingElement>(null);
   const previous = useRef(routine);
   useEffect(() => {
-    if (routine && !previous.current) heading.current?.focus();
+    if (routine && !previous.current && state.phase === "teaching") heading.current?.focus();
     previous.current = routine;
-  }, [routine]);
+  }, [routine, state.phase]);
   const readiness = validateTeaching(state, "Vendor Security Review");
   return <section className={`panel routine-panel ${routine ? "routine-learned" : "routine-empty"}`} aria-labelledby="routine-heading">
     <p className="eyebrow">Memory Rail · {routine ? "Learned routine" : "Teach"}</p>
@@ -28,6 +29,7 @@ export function RoutinePanel() {
       <p className="muted teaching-readiness">{readiness?.message ?? "Ready to teach the procedures observed in this collaboration."}</p>
     </> : <>
       <p className="form-success" role="status">Routine learned. Review what changes and what stays fixed.</p>
+      <ReplayLauncher />
       <div className="routine-group">
         <h3><span className="routine-label variable-label">Variable</span> Inputs</h3>
         <ul className="routine-inputs">{routine.inputs.map((input) => <li key={input.key}><strong>{input.key === "budget" ? "Budget" : "Candidates"}</strong><span>{input.type === "money" ? "New amount in USD each run" : `${input.minItems}–${input.maxItems} new candidates each run`}</span></li>)}</ul>
@@ -57,7 +59,7 @@ export function RoutinePanel() {
         {routine.compilerNotes.filter((note) => note.kind === "example_only").length ? <ul>{routine.compilerNotes.filter((note) => note.kind === "example_only").map((note) => <li key={note.message}>{note.message}</li>)}</ul> : <p>No one-off human evidence or score corrections were observed.</p>}
         <p className="muted">ONCE does not infer new business rules from correction text.</p>
       </div>
-      <p className="scope-note">Saved in this browser. This collaboration is now read-only. Replay with new inputs comes in M5.</p>
+      <p className="scope-note">Saved in this browser. Replay repeats only these learned Vendor Evaluation procedures with new inputs. Example-only corrections remain historical context.</p>
     </>}
   </section>;
 }
