@@ -1,4 +1,5 @@
 import { HUMAN_ONLY, LIFECYCLE, SYSTEM_ONLY, type CommandRequest, type CommandType } from "./commands";
+import { validateTeaching } from "../teaching/validate-teaching";
 import { ACTORS, type AppState, type CommandError } from "./types";
 
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -98,7 +99,8 @@ export function validateCommand(state: AppState, request: CommandRequest): Comma
       break;
   }
   if (request.phase !== state.phase) return error("INVALID_PHASE", "The command phase does not match the current workspace.");
-  if (LIFECYCLE.includes(request.type)) return error("NOT_IMPLEMENTED", "Teaching, replay, and approval execution are not available in this milestone.");
+  if (LIFECYCLE.includes(request.type) && request.type !== "TEACH_ROUTINE") return error("NOT_IMPLEMENTED", "Replay and approval execution are not available in this milestone.");
   if (state.phase !== "collaboration" || request.replayRunId !== undefined) return error("INVALID_PHASE", "This command requires an active collaboration workspace.");
+  if (request.type === "TEACH_ROUTINE") return validateTeaching(state, request.payload.routineName);
   return null;
 }

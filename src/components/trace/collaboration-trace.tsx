@@ -27,6 +27,7 @@ export function CollaborationTrace() {
               <li key={event.eventId} className={event.outcome === "rejected" ? "rejected" : ""}>
                 <div className="event-meta"><span className={`actor actor-${event.actor.kind}`}>{labels[event.actor.kind]}</span><span className="event-sequence">#{event.sequence}</span></div>
                 <p>{event.summary}</p>
+                {event.teaching.disposition !== "lifecycle" && event.teaching.disposition !== "excluded" ? <span className="event-classification">{event.teaching.disposition === "example_only" ? "Example only — not generalized" : event.teaching.disposition === "procedure" ? "Procedure · outputs generated each run" : event.teaching.disposition === "variable" ? "Variable input" : "Fixed policy"}</span> : null}
                 {event.outcome === "rejected" ? <span className="rejection-label">Not applied</span> : null}
               </li>
             ))}

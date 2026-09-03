@@ -101,3 +101,30 @@ summary { cursor: pointer; font-weight: 600; color: var(--green); }
 .trace [role="log"] { max-height: 620px; overflow-y: auto; scrollbar-gutter: stable; }
 .routine-empty p { font-size: 14px; }
 @media (max-width: 760px) { .setup-controls { grid-template-columns: 1fr; } .panel { padding: 18px; } .trace [role="log"] { max-height: 450px; } }
+
+/* M4 semantic classification and learned routine. */
+.workspace-controls { min-width: 0; border: 0; padding: 0; margin: 0; }
+.workspace-controls:disabled button { cursor: default; opacity: .6; }
+.event-classification { display: block; color: var(--muted); font-size: 11px; margin-top: 6px; }
+.routine-panel h2 { overflow-wrap: anywhere; }
+.routine-panel h2:focus-visible { outline: 3px solid #9a6a19; outline-offset: 5px; }
+.routine-learned { border-top: 3px solid var(--green); }
+.routine-group { border-top: 1px solid var(--line); padding-top: 18px; margin-top: 18px; font-size: 13px; }
+.routine-group h3 { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 15px; }
+.routine-group p { margin: 10px 0 0; }
+.routine-label { border-radius: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: .7px; padding: 3px 6px; }
+.variable-label { background: #e3eaf4; color: #375270; }
+.policy-label { background: #e1eade; color: #35572c; }
+.procedure-label { background: #eee7db; color: #665431; }
+.routine-inputs { list-style: none; padding: 0; margin: 10px 0 0; }
+.routine-inputs li { margin: 9px 0; }
+.routine-inputs span, .routine-steps span { display: block; color: var(--muted); }
+.routine-policies, .routine-steps { list-style: decimal; padding-left: 22px; margin: 12px 0 0; }
+.routine-policies li, .routine-steps li { padding-left: 3px; margin-top: 12px; overflow-wrap: anywhere; }
+.routine-policies .required-badge { margin-top: 0; }
+.routine-steps small { color: var(--muted); font-size: 11px; font-weight: 400; }
+.routine-gate-step { color: #775417; }
+.human-checkpoint, .example-only, .teaching-boundary { background: #f6f1e6; border: 1px solid #e0d3b8; border-radius: 7px; padding: 14px; }
+.example-only ul { padding-left: 18px; margin-bottom: 0; }
+.example-only li + li { margin-top: 10px; }
+.teaching-boundary, .teaching-readiness { font-size: 12px; }

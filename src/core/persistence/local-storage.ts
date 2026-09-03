@@ -1,3 +1,4 @@
+import { compileRoutine } from "../teaching/compiler";
 import { createDemoSeed } from "../demo/seed";
 import { ACTORS, type AppState } from "../domain/types";
 import { isCommandType, isRecord, nonempty, validPayload } from "../domain/validate-command";
@@ -8,8 +9,8 @@ const natural = (v: unknown) => typeof v === "number" && Number.isSafeInteger(v)
 const unique = (values: string[]) => new Set(values).size === values.length;
 
 function validSnapshot(value: unknown): value is AppState {
-  if (!isRecord(value) || value.schemaVersion !== 1 || !natural(value.stateVersion) || !nonempty(value.sessionId) || value.phase !== "collaboration" || value.replay !== null) return false;
-  if (!isRecord(value.teaching) || value.teaching.status !== "idle" || value.teaching.routine !== null || !Array.isArray(value.teaching.compilerNotes) || value.teaching.compilerNotes.length !== 0) return false;
+  if (!isRecord(value) || value.schemaVersion !== 1 || !natural(value.stateVersion) || !nonempty(value.sessionId) || (value.phase !== "collaboration" && value.phase !== "teaching") || value.replay !== null) return false;
+  if (!isRecord(value.teaching) || !Array.isArray(value.teaching.compilerNotes)) return false;
   const w = value.workspace;
   if (!isRecord(w) || !nonempty(w.title) || !isRecord(w.budget) || w.budget.currency !== "USD" || (w.budget.amount !== null && !validPayload("SET_BUDGET", w.budget))) return false;
   if (!Array.isArray(w.candidates) || !Array.isArray(w.criteria) || !Array.isArray(w.evidence) || !Array.isArray(w.scores) || !Array.isArray(w.uncertainties)) return false;
@@ -48,7 +49,19 @@ function validSnapshot(value: unknown): value is AppState {
     return e.outcome === "applied"
       ? validPayload(e.command.type, e.command.payload) && e.error === undefined
       : e.outcome === "rejected" && isRecord(e.error) && nonempty(e.error.code) && nonempty(e.error.message);
-  }) && unique(value.trace.map((e) => e.eventId));
+  }) && unique(value.trace.map((e) => e.eventId)) && validTeachingSnapshot(value);
+}
+
+function validTeachingSnapshot(value: Record<string, unknown>): boolean {
+  const teaching = value.teaching as Record<string, unknown>;
+  if (teaching.status === "idle") return value.phase === "collaboration" && teaching.routine === null && (teaching.compilerNotes as unknown[]).length === 0;
+  if (teaching.status !== "compiled" || value.phase !== "teaching" || !isRecord(teaching.routine)) return false;
+  const routine = teaching.routine;
+  if (!nonempty(routine.id) || !nonempty(routine.name) || !nonempty(routine.createdAt) || !Number.isFinite(Date.parse(routine.createdAt))) return false;
+  // The source workspace and trace above are validated. Recompilation checks
+  // every nested routine field and prevents stored literals becoming rules.
+  const compiled = compileRoutine(value as AppState, { id: routine.id, name: routine.name, createdAt: routine.createdAt });
+  return compiled.ok && JSON.stringify(compiled.routine) === JSON.stringify(routine) && JSON.stringify(compiled.routine.compilerNotes) === JSON.stringify(teaching.compilerNotes);
 }
 
 export function serializeSnapshot(state: AppState): string {

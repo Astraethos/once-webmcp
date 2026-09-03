@@ -3,12 +3,13 @@
 Teach an agent by working with it once.
 
 ONCE is an open-source Vendor Evaluation experiment for the OpenAI WebMCP Challenge.
-The **M3 collaboration workspace** is implemented: human controls and native
+The **M4 collaboration and Teach experience** is implemented: human controls and native
 WebMCP handlers share one synchronous command bus, comparison matrix, and
 actor-tagged trace. Budget, criteria, evidence, scores, uncertainty, policy, and
 an initial recommendation persist in this browser. Vendor dossiers are fixed,
 fictional first-party facts.
-Teaching, replay, and approval execution are not implemented.
+Human-only **Teach this routine** compiles Vendor Evaluation semantics into a
+persisted routine. Replay and approval execution are not implemented.
 M3 is accepted under an explicit external-client release exception. Deployed
 ChatGPT Work invocation remains externally blocked and unverified; it must be
 retried during M6 before final submission. See the
@@ -33,7 +34,7 @@ pnpm dev
 Open http://localhost:3000. Set a budget, add candidates and criteria, then use
 the comparison cells to attach evidence and score each vendor. Look for HUMAN
 trace events. Refresh to restore the workspace. **Reset demo** asks for confirmation,
-then clears the workspace, trace, and saved snapshot for this origin.
+then clears the workspace, trace, learned routine, and saved snapshot for this origin.
 No environment variables, API keys, database, or paid services are needed.
 
 ## Verification
@@ -99,15 +100,34 @@ not exposed as tools.
 
 If WebMCP is unavailable or registration fails, the page shows a notice and the
 human UI remains usable. Registration success alone does not prove agent discovery
-or invocation. The Memory Rail shows the collaboration trace above an empty
-Routine panel. On narrow screens, it sits below the workspace; the comparison
+or invocation. The Memory Rail shows semantic classifications in the trace above
+the Routine panel. On narrow screens, it sits below the workspace; the comparison
 matrix scrolls horizontally.
 
-The exact lifecycle command payloads are declared but return `NOT_IMPLEMENTED`
-until M4/M5. Teaching and replay state remain inactive; semantic teaching labels
-are annotations, not a compiler. Approval policy can be stored but no approval
-workflow executes. Required-criterion recommendation eligibility is validated
+Replay and approval lifecycle commands remain `NOT_IMPLEMENTED` until M5.
+Approval policy is preserved by Teach, but no approval workflow executes. Required-criterion recommendation eligibility is validated
 in the core using the approved score threshold of 3.
+
+## Teach a Vendor Evaluation routine
+
+After collaborating, name the routine and click **Teach this routine** in the
+Memory Rail. Teach requires a valid budget, 2–4 candidates, at least one criterion,
+and at least one observed evidence, scoring, uncertainty, or recommendation action.
+It does not require every procedure or a completed matrix. Incomplete collaboration
+returns `TEACHING_INCOMPLETE`; malformed inputs retain `INVALID_PAYLOAD`.
+
+The panel separates variable inputs, fixed criterion/approval policies, observed
+procedures, the human checkpoint, generated outputs, and **Example only — not
+generalized** corrections. Candidate × criterion actions become loops. Evidence,
+scores, rationales, and recommendation values are excluded from the routine.
+One-off human evidence and score corrections produce notes, never new policies.
+
+Teach records human consent through the command bus, saves the approved `Routine`
+model in `once:v1:state`, and enters read-only routine review. Refresh restores the
+routine; Reset clears it. No WebMCP tool can teach. The compiler is deterministic
+for a fixed source and supplied identity/time metadata. See
+[Architecture](docs/ARCHITECTURE.md#deterministic-routine-compiler) for the rules and
+[M4 verification](docs/M4-VERIFICATION.md) for actual test and browser evidence.
 
 ## Documentation standards
 
@@ -127,7 +147,7 @@ ONCE is licensed under the [MIT License](LICENSE).
 
 - Retry native ChatGPT Work invocation during M6 before final submission.
   The M3 release exception does not constitute a successful native invocation.
-- M4 will implement Teach and deterministic routine compilation after M3 release.
+- M5 will implement replay with new inputs and human approval.
 - ESLint is pinned to 9.39.5 because the template's React/import/accessibility
   plugins do not yet support ESLint 10. ESLint 9 is deprecated upstream; upgrade
   the plugin set and ESLint together when compatible releases are available.

@@ -4,6 +4,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { OnceProvider, useOnceState, useOnceStore } from "../../core/store/once-provider";
 import { registerTools, type WebMCPStatus } from "../../webmcp/register-tools";
 import { EvaluationWorkspace } from "../workspace/evaluation-workspace";
+import { RoutinePanel } from "../routine/routine-panel";
 import { CollaborationTrace } from "../trace/collaboration-trace";
 
 const capabilityText: Record<WebMCPStatus, string> = {
@@ -16,7 +17,7 @@ const capabilityText: Record<WebMCPStatus, string> = {
 
 function WorkspaceShell() {
   const store = useOnceStore();
-  const { sessionId, stateVersion } = useOnceState();
+  const { sessionId, stateVersion, phase } = useOnceState();
   const [webmcp, setWebmcp] = useState<WebMCPStatus>("checking");
   const [resetCount, setResetCount] = useState(0);
   const persistenceError = useSyncExternalStore(store.subscribe, store.getPersistenceError, () => null);
@@ -29,7 +30,7 @@ function WorkspaceShell() {
   }, [store]);
 
   function resetDemo() {
-    if (!window.confirm("Reset the demo? This clears the workspace and collaboration trace saved in this browser.")) return;
+    if (!window.confirm("Reset the demo? This clears the workspace, collaboration trace, and learned routine saved in this browser.")) return;
     store.resetDemo();
     setResetCount((count) => count + 1);
   }
@@ -40,14 +41,14 @@ function WorkspaceShell() {
         <div><h1 className="wordmark">ONCE<span aria-hidden="true">.</span></h1><p className="tagline">Teach an agent by working with it once.</p></div>
         <button className="secondary" onClick={resetDemo}>Reset demo</button>
       </header>
-      <div className="phase-bar"><span className="phase">Collaborate</span><span className="muted">Human + agent · one shared evaluation</span></div>
+      <div className="phase-bar"><span className="phase">{phase === "teaching" ? "Teach" : "Collaborate"}</span><span className="muted">{phase === "teaching" ? "Learned routine · review what carries forward" : "Human + agent · one shared evaluation"}</span></div>
       <p className={`capability capability-${webmcp}`} role="status">{capabilityText[webmcp]}</p>
       {persistenceError ? <p className="storage-warning" role="alert">{persistenceError}</p> : null}
       <div className="workspace-layout">
-        <EvaluationWorkspace key={`${sessionId}-${resetCount}`} />
+        <fieldset className="workspace-controls" disabled={phase === "teaching"}><legend className="sr-only">Vendor evaluation controls</legend><EvaluationWorkspace key={`${sessionId}-${resetCount}`} /></fieldset>
         <aside className="memory-rail" aria-label="Memory Rail">
           <CollaborationTrace />
-          <section className="panel routine-empty" aria-labelledby="routine-heading"><p className="eyebrow">Memory Rail</p><h2 id="routine-heading">Routine</h2><p>No routine taught yet.</p><p className="muted">Your collaboration is recorded above. Teaching a reusable routine comes next.</p></section>
+          <RoutinePanel key={`${sessionId}-${resetCount}`} />
         </aside>
       </div>
       <footer><span>Local demo · no account or external research</span><span>Snapshot {stateVersion}</span></footer>
