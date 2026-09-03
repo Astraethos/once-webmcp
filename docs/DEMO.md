@@ -2,7 +2,7 @@
 
 > **Document status:** Approved demo plan
 > **Describes:** Exact under-three-minute competition scenario
-> **Implementation baseline:** Pre-implementation, 2026-09-02
+> **Implementation baseline:** Final M6 production implementation, 2026-09-03
 > **Update when:** Demo data, timing, prompts, or visual sequence changes
 
 ## Demo objective
