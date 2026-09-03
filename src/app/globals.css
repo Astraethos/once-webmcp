@@ -98,9 +98,10 @@ summary { cursor: pointer; font-weight: 600; color: var(--green); }
 .uncertainty-list p { margin-top: 4px; }
 .recommendation h4 { margin: 12px 0 0; font-size: 20px; }
 .memory-rail { display: grid; gap: 20px; min-width: 0; }
-.trace [role="log"] { max-height: 620px; overflow-y: auto; scrollbar-gutter: stable; }
+.trace [role="log"] { height: 220px; overflow-y: auto; scrollbar-gutter: stable; }
+.trace [role="log"]:focus-visible { outline: 3px solid #9a6a19; outline-offset: 4px; }
 .routine-empty p { font-size: 14px; }
-@media (max-width: 760px) { .setup-controls { grid-template-columns: 1fr; } .panel { padding: 18px; } .trace [role="log"] { max-height: 450px; } }
+@media (max-width: 760px) { .setup-controls { grid-template-columns: 1fr; } .panel { padding: 18px; } }
 
 /* M4 semantic classification and learned routine. */
 .workspace-controls { min-width: 0; border: 0; padding: 0; margin: 0; }

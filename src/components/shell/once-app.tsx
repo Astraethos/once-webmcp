@@ -10,7 +10,7 @@ import { CollaborationTrace } from "../trace/collaboration-trace";
 const capabilityText: Record<WebMCPStatus, string> = {
   checking: "Checking native WebMCP…",
   ready: "Native WebMCP registered · 10 tools",
-  unavailable: "WebMCP is unavailable in this browser. You can still use the human workspace.",
+  unavailable: "WebMCP is unavailable in this browser. Use ChatGPT’s in-app browser or Chrome 149+ with WebMCP testing enabled for agent actions. The human workspace remains available.",
   failed: "WebMCP registration failed. Reload in a supported browser; the human workspace remains available.",
   cancelled: "WebMCP registration ended.",
 };

@@ -3,8 +3,48 @@
 > **Document status:** Maintained submission checklist
 > **Research verification date:** 2026-09-02
 > **Describes:** Current challenge requirements plus ONCE submission strategy
-> **Update when:** Official challenge requirements change
+> **Update when:** Official requirements or verified submission status changes
 > **Authoritative sources:** OpenAI challenge page and Devpost official rules
+
+## Technical handoff for final creative materials
+
+M1–M5 behavior is implemented. M6 prepares technical verification and repository
+materials; it does not authorize the final submission tag or declare a freeze.
+See [M6 verification](M6-VERIFICATION.md) for tested revisions and limitations.
+
+| Field | Factual value / owner |
+| --- | --- |
+| Project | ONCE — Teach an agent by working with it once. |
+| Live URL | https://once-webmcp.vercel.app/ |
+| Public repository | https://github.com/Astraethos/once-webmcp |
+| License | MIT; GitHub detection verified during M6 |
+| Implemented loop | Collaborate → Teach → Replay with new inputs → Human approval → Complete |
+| Domain | Deterministic Vendor Evaluation; four fictional first-party dossiers |
+| Agent integration | Ten native WebMCP tools, shared semantic command bus |
+| Runtime | Next.js 16.3.4, React 19.2.8, TypeScript; browser-local persistence |
+| Application services | No login, database, external research, API keys, or embedded LLM |
+| Technical evidence | Native production invocation in Codex's in-app browser; separate Work invocation remains unverified |
+| Video URL | Pending — supplied by the video/demo owner |
+| Final description | Pending — supplied by the Demo Strategy and Storyboard owner |
+| Devpost project URL / submission | Pending — supplied by the submission owner |
+| Final tag / freeze | Await explicit user authorization after video, Devpost, and deployed site are final |
+
+Human UI and WebMCP actions enter the same semantic command bus. The trace
+records actor, channel, phase, outcome, and readable actions. Teach converts budget
+and candidates into variables, preserves criterion and approval policies, and
+compiles observed procedures. Evidence, scores, recommendation text, and one-off
+corrections are excluded from durable rules. Replay restores policies with new
+inputs, creates fresh outputs, and blocks recommendation until human approval.
+Only the human UI can teach, start replay, approve, reject, and reset.
+
+This paragraph is factual technical input for the separate creative workflow;
+it is not final video narration or a completed Devpost submission.
+
+**Work limitation:** the historical result was “The admin-enforced policy could
+not be verified.” During M6, the available computer-use tool denied access to the
+ChatGPT app surface, so no new Work invocation result could be obtained. Native
+production calls in the Codex in-app browser are separate evidence. Do not label
+Site Tools discovery or registration alone as successful Work invocation.
 
 ## Current challenge facts
 
@@ -144,7 +184,7 @@ The ambition is conceptual, while implementation remains deliberately constraine
 
 ## Final README requirements
 
-Before submission, replace setup-only README with a competition README containing:
+The competition README now describes the implemented loop. Before final submission, add the real video link and verify these requirements:
 
 ### Top section
 
@@ -218,7 +258,7 @@ MIT.
 
 ### Vercel
 
-Configure after M2, per `IMPLEMENTATION.md`.
+Vercel is connected to the public repository and deploys `main` automatically.
 
 Before final submission verify:
 
@@ -240,7 +280,7 @@ Conservative action:
 1. merge final submission PR;
 2. wait for CI and Vercel success;
 3. perform final live verification;
-4. create Git tag `submission-2026-09-03`;
+4. after the user confirms the final video, Devpost materials, and deployed site, obtain explicit authorization to create Git tag `submission-2026-09-03`;
 5. submit exact live URL and repo;
 6. after deadline, do not modify submitted repo/live deployment until judging ends unless official organizers authorize a correction.
 
@@ -256,7 +296,7 @@ Before recording:
 - ChatGPT in-app browser already on deployed URL;
 - exact prompts copied somewhere safe;
 - memory rail visible;
-- page zoom suitable for readable trace;
+- normal 100% browser zoom; verify the recording viewport and readable trace;
 - no personal account details visible.
 
 Record:
@@ -277,7 +317,7 @@ Final export:
 - target 2:40–2:55;
 - clear audio;
 - readable 1080p or better;
-- public/unlisted availability as permitted by Devpost requirement for public visibility;
+- publicly visible on YouTube, as required by the official rules;
 - no copyrighted background music.
 
 ## Suggested submission description structure
