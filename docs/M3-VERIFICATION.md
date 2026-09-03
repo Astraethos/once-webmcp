@@ -1,9 +1,24 @@
 # M3 verification record
 
-> **Document status:** Implementation evidence; deployed invocation checkpoint pending
+> **Document status:** M3 accepted under an explicit external-client release exception
 > **Baseline:** M3 Vendor Collaboration, 2026-09-02
 > **Authority:** [Acceptance](ACCEPTANCE.md), [Implementation](IMPLEMENTATION.md), and the user's M3 authorization
 > **Update when:** CI, deployment, or native ChatGPT Work invocation is verified
+
+## M3 release exception — 2026-09-02
+
+The user approved M3 release with native ChatGPT Work invocation externally
+blocked and unverified. The user accepted the 143 full-suite tests, 47 M3 tests,
+lint, typecheck, production build, GitHub CI, Vercel preview, complete human
+collaboration workflow, persistence/reset/responsive checks, empty warning/error
+console logs, and registration of all 10 approved native WebMCP tools.
+
+The remaining invocation requirement is blocked by the previously documented
+ChatGPT Work browser policy/runtime issue, with no evidence of an ONCE defect.
+This exception authorizes M3 release only. Native ChatGPT Work invocation must
+be retried during M6 before final submission. Registration and adapter tests do
+not establish successful native invocation. Architecture and acceptance criteria
+remain unchanged.
 
 ## Implemented scope
 
@@ -76,7 +91,7 @@ This was a connector limitation, not an application failure.
 ## CI and deployed preview
 
 [PR #7 — M3: Complete Vendor Collaboration](https://github.com/Astraethos/once-webmcp/pull/7)
-is open on `feat/m3-collaboration-domain`. Implementation revision
+was developed on `feat/m3-collaboration-domain`. Implementation revision
 `db6c8ce737c6ff7b9f6247f494445ea784bc712d` passed
 [GitHub CI](https://github.com/Astraethos/once-webmcp/actions/runs/33698218104)
 and Vercel deployment checks.
@@ -88,12 +103,12 @@ ChatGPT Work checkpoint. No production deployment was promoted manually.
 
 ## Deployed integration checkpoint
 
-Pending. The exact first prompt from [Demo](DEMO.md) has not been successfully
+Externally blocked and unverified. The exact first prompt from [Demo](DEMO.md) has not been successfully
 executed through native ChatGPT Work for M3. The user authorized M3 implementation
 because M2 invocation is blocked by external admin-policy verification. Codex's
 Chrome connector still has no native WebMCP invocation interface.
 
 Local HUMAN browser actions and unit-test AGENT calls are reported separately.
 No simulated agent browser events or fallback global functions were introduced.
-M3 must not be described as fully accepted until the required deployed run passes
-or the user explicitly changes that release gate.
+M3 is accepted under the release exception above. The final native invocation
+checkpoint remains outstanding and must be retried during M6 before submission.

@@ -9,8 +9,10 @@ actor-tagged trace. Budget, criteria, evidence, scores, uncertainty, policy, and
 an initial recommendation persist in this browser. Vendor dossiers are fixed,
 fictional first-party facts.
 Teaching, replay, and approval execution are not implemented.
-Deployed ChatGPT Work invocation remains an external integration checkpoint;
-see the [M3 verification record](docs/M3-VERIFICATION.md) for actual evidence.
+M3 is accepted under an explicit external-client release exception. Deployed
+ChatGPT Work invocation remains externally blocked and unverified; it must be
+retried during M6 before final submission. See the
+[M3 verification record](docs/M3-VERIFICATION.md) for the exception and evidence.
 ONCE does not claim arbitrary workflow learning.
 
 ## Stack
@@ -123,9 +125,8 @@ ONCE is licensed under the [MIT License](LICENSE).
 
 ## Follow-ups
 
-- Finish the deployed ChatGPT Work M3 integration checkpoint before declaring
-  M3 accepted. The user authorized M3 implementation despite M2's external
-  admin-policy invocation failure; this does not constitute a successful M3 run.
+- Retry native ChatGPT Work invocation during M6 before final submission.
+  The M3 release exception does not constitute a successful native invocation.
 - M4 will implement Teach and deterministic routine compilation after M3 release.
 - ESLint is pinned to 9.39.5 because the template's React/import/accessibility
   plugins do not yet support ESLint 10. ESLint 9 is deprecated upstream; upgrade
