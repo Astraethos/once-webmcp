@@ -128,7 +128,9 @@ After **Reset demo**:
 - approval policy disabled;
 - trace contains only a compact ONCE ready state if needed.
 
-## Exact first prompt to ChatGPT Work
+## Exact first prompt to a WebMCP-capable agent
+
+Production native invocation was verified in Codex's in-app browser; separate ChatGPT Work invocation remains unverified.
 
 Use a short command-oriented prompt:
 
@@ -151,7 +153,7 @@ Bulk tools keep the interaction short while the trace still records granular sem
 
 After the agent finishes:
 
-1. Change **Security** to `Required`.
+1. Ensure **Security** is required and remains priority 1.
 2. Keep Security at priority 1.
 3. Enable **Require human approval before final recommendation**.
 4. Correct BeaconStack security evidence so the visible summary explicitly says SAML SSO requires the Enterprise add-on.
@@ -252,7 +254,7 @@ Expected invariant state immediately after start:
 - approval policy is active;
 - no old candidate names, evidence, scores, or recommendation are copied.
 
-## Exact replay prompt to ChatGPT Work
+## Exact replay prompt to a WebMCP-capable agent
 
 > Run the active ONCE routine with the new inputs. Use the replay plan and ONCE vendor dossiers. Complete the required evidence and scores, then follow the routine through its approval boundary.
 

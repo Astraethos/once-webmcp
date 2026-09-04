@@ -54,7 +54,7 @@ Verified on 2026-09-02.
 
 Submission deadline:
 
-**September 3, 2026 at 1:00 PM Pacific Time**
+**September 4, 2026 at 1:00 AM Pacific Time**
 
 Authoritative rule page:
 
@@ -280,7 +280,7 @@ Conservative action:
 1. merge final submission PR;
 2. wait for CI and Vercel success;
 3. perform final live verification;
-4. after the user confirms the final video, Devpost materials, and deployed site, obtain explicit authorization to create Git tag `submission-2026-09-03`;
+4. after the user confirms the final video, Devpost materials, and deployed site, obtain explicit authorization to create Git tag `submission-2026-09-04`;
 5. submit exact live URL and repo;
 6. after deadline, do not modify submitted repo/live deployment until judging ends unless official organizers authorize a correction.
 

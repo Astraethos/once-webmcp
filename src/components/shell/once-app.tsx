@@ -54,7 +54,7 @@ function WorkspaceShell() {
           <RoutinePanel key={`${sessionId}-${resetCount}`} />
         </aside>
       </div>
-      <footer><span>Local demo · no account or external research</span><span>Snapshot {stateVersion}</span></footer>
+      <footer><span>Deterministic demo · no account or external research</span><span>Snapshot {stateVersion}</span></footer>
     </main>
   );
 }
