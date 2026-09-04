@@ -4,13 +4,14 @@
 
 ONCE explores how one successful human-agent collaboration can become reusable procedural memory. For the OpenAI WebMCP Challenge, ONCE proves that interaction model through a deterministic Vendor Evaluation MVP: human and agent work together once, teach what should persist, replay with new inputs, and stop at the learned human approval boundary.
 
+[Watch the 3-minute demo](https://youtu.be/jTEuvUEGfok) ·
 [Live demo](https://once-webmcp.vercel.app/) ·
 [Demo walkthrough and exact prompts](docs/DEMO.md) ·
 [M6 verification](docs/M6-VERIFICATION.md)
 
 Built for the [OpenAI WebMCP Challenge](https://openai.com/webmcp-challenge/).
-The final demo video and Devpost submission are pending; technical verification
-is recorded separately from submission completion.
+The Devpost submission is pending; technical verification is recorded separately
+from submission completion.
 
 ## Why ONCE
 

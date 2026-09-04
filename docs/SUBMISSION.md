@@ -24,7 +24,7 @@ See [M6 verification](M6-VERIFICATION.md) for tested revisions and limitations.
 | Runtime | Next.js 16.3.4, React 19.2.8, TypeScript; browser-local persistence |
 | Application services | No login, database, external research, API keys, or embedded LLM |
 | Technical evidence | Native production invocation in Codex's in-app browser; separate Work invocation remains unverified |
-| Video URL | Pending — supplied by the video/demo owner |
+| Video URL | https://youtu.be/jTEuvUEGfok |
 | Final description | Pending — supplied by the Demo Strategy and Storyboard owner |
 | Devpost project URL / submission | Pending — supplied by the submission owner |
 | Final tag / freeze | Await explicit user authorization after video, Devpost, and deployed site are final |
